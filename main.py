@@ -1,4 +1,3 @@
-#11/26/2023 14:18 PM
 import numpy as np
 import os
 import librosa as lrs
@@ -9,14 +8,8 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 
-
-# Constants
 sample_rate = 16000
 vowels = ['a', 'e', 'i', 'o', 'u']
-NFFT = 2048
-frame_size = int(20 * sample_rate / 1000)  # Frame length in samples
-hop_size = int(10 * sample_rate / 1000)  # Frame step in samples
-
 
 def extract_middle_part(signal):
     length = len(signal)
@@ -35,30 +28,30 @@ def custom_frame(signal, frame_length, hop_size):
         end = start + frame_length
         frames[i] = signal[start:end]
 
-    return frames.T  # Return frames array, each frame element is horizontal
+    return frames.T  #ma trận chuyển vị, mỗi phần tử là 1 frame chiều ngang
 
 
-def calculate_mean_fft(signal, frame_length=frame_size, hop_size=hop_size, NFFT=NFFT):
+def calculate_mean_fft(signal, frame_length, hop_size, N_FFT):
     middle_part = extract_middle_part(signal)
     frames = custom_frame(middle_part, frame_length, hop_size)
 
-    # Perform FFT on each frame
-    fft_frames = np.fft.fft(frames, NFFT, axis=0)
+    # Tính FFt mỗi frame
+    fft_frames = np.fft.fft(frames, N_FFT, axis=0)
 
-    # Get the absolute values of the real and imaginary components
+    # Lấy giá trị tuyệt đối của giá trị
     abs_fft_frames = np.abs(fft_frames)
 
-    # Calculate the mean value across frames horizontally
+    #Tính giá trị trung bình của các khung theo hàng ngang
     mean_abs_fft_frames = np.mean(abs_fft_frames, axis=1)
 
-    return mean_abs_fft_frames
-
+    return mean_abs_fft_frames          #trả về giá trị fft của 1 tín hiệu 1 người
 
 def calculate_each_vowel_feature(signals):
     temp = []
     for signal in signals:
-        temp.append(calculate_mean_fft(signal))
+        temp.append(calculate_mean_fft(signal,frame_size,shift_size,N_FFT))
     temp = np.array(temp)
+    #tính giá trị trung bình của 1 tín hiệu nhiều người
     feature = np.mean(temp, axis=0)
     return feature
 
@@ -75,14 +68,13 @@ def read_vowels_file(data_path, target_vowel):
                 signal, fs = lrs.load(file_path)
                 vowel_signals.append(signal)
 
-    return vowel_signals
-
+    return vowel_signals           #mảng của 1 nguyên âm
 
 def predict_signal_label(signal, known_features, target_labels):
     min_distance = 1e9
     predicted_label = None
 
-    test_feature = calculate_mean_fft(signal)
+    test_feature = calculate_mean_fft(signal,frame_size,shift_size,N_FFT)
 
     for label, feature in zip(target_labels, known_features):
         distance = np.linalg.norm(test_feature - feature)
@@ -120,7 +112,9 @@ training_path = "D:\\ex2\\trimmed-NguyenAmHuanLuyen-16k"
 testing_path = "D:\\ex2\\trimmed-NguyenAmKiemThu-16k"
 
 
-
+N_FFT = 512
+frame_size = int(25 * sample_rate / 1000)
+shift_size = int(21 * sample_rate / 1000) 
 # Extract features
 features = []
 for i in range(5):
@@ -138,9 +132,9 @@ target_labels = vowels
 evaluate_testing_set(testing_path, features, target_labels)
 
 
-# # Xuất 05 vector đặc trưng biểu diễn 05 nguyên âm trên cùng 01 đồ thị.
-# # Plot features
-# frequencies = np.fft.fftfreq(NFFT, 1/sample_rate)
+# Xuất 05 vector đặc trưng biểu diễn 05 nguyên âm trên cùng 01 đồ thị.
+# Plot features
+# frequencies = np.fft.fftfreq(N_FFT, 1/sample_rate)
 
 # for i in range(5):
 #     plt.plot(frequencies, features[i], label=vowels[i])
@@ -153,38 +147,38 @@ evaluate_testing_set(testing_path, features, target_labels)
 
 
 
-def create_confusion_matrix(testing_path, known_features, target_labels):
-    true_labels = []
-    predicted_labels = []
+# def create_confusion_matrix(testing_path, known_features, target_labels):
+#     true_labels = []
+#     predicted_labels = []
 
-    for dirs in sorted(os.listdir(testing_path)):
-        sub_path = os.path.join(testing_path, dirs)
-        for file_name in sorted(os.listdir(sub_path)):
-            file_path = os.path.join(sub_path, file_name)
-            true_label = file_name[0]
-            signal, fs = lrs.load(file_path)
+#     for dirs in sorted(os.listdir(testing_path)):
+#         sub_path = os.path.join(testing_path, dirs)
+#         for file_name in sorted(os.listdir(sub_path)):
+#             file_path = os.path.join(sub_path, file_name)
+#             true_label = file_name[0]
+#             signal, fs = lrs.load(file_path)
 
-            predicted_label = predict_signal_label(signal, known_features, target_labels)
+#             predicted_label = predict_signal_label(signal, known_features, target_labels)
 
-            true_labels.append(true_label)
-            predicted_labels.append(predicted_label)
+#             true_labels.append(true_label)
+#             predicted_labels.append(predicted_label)
 
-    # Tạo confusion matrix
-    cm = confusion_matrix(true_labels, predicted_labels, labels=target_labels)
+#     # Tạo confusion matrix
+#     cm = confusion_matrix(true_labels, predicted_labels, labels=target_labels)
 
-    # Hiển thị confusion matrix bằng heatmap
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=target_labels, yticklabels=target_labels)
-    plt.xlabel('Predicted Labels')
-    plt.ylabel('True Labels')
-    plt.title('Confusion Matrix')
-    plt.show()
+#     # Hiển thị confusion matrix bằng heatmap
+#     plt.figure(figsize=(8, 6))
+#     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=target_labels, yticklabels=target_labels)
+#     plt.xlabel('Predicted Labels')
+#     plt.ylabel('True Labels')
+#     plt.title('Confusion Matrix')
+#     plt.show()
 
-# Đường dẫn của thư mục chứa 21 tập folder
-testing_path = "D:/ex2/trimmed-NguyenAmKiemThu-16k"
+# # Đường dẫn của thư mục chứa 21 tập folder
+# testing_path = "D:/ex2/trimmed-NguyenAmKiemThu-16k"
 
-# Tạo confusion matrix
-create_confusion_matrix(testing_path, features, vowels)
+# # Tạo confusion matrix
+# create_confusion_matrix(testing_path, features, vowels)
 
 
 
