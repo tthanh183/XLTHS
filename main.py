@@ -28,7 +28,7 @@ def custom_frame(signal, frame_length, hop_size):
         end = start + frame_length
         frames[i] = signal[start:end]
 
-    return frames.T  #ma trận chuyển vị, mỗi phần tử là 1 frame chiều ngang
+    return frames.T  #ma trận chuyển vị, mỗi phần tử là 1 frame
 
 
 def calculate_mean_fft(signal, frame_length, hop_size, N_FFT):
@@ -108,8 +108,8 @@ def evaluate_testing_set(testing_path, known_features, target_labels):
 
 
 # Paths
-training_path = "D:\\ex2\\trimmed-NguyenAmHuanLuyen-16k"
-testing_path = "D:\\ex2\\trimmed-NguyenAmKiemThu-16k"
+training_path = "D:\\BTNhom_XLTHS\\ex2\\trimmed-NguyenAmHuanLuyen-16k"
+testing_path = "D:\\BTNhom_XLTHS\\ex2\\trimmed-NguyenAmKiemThu-16k"
 
 
 N_FFT = 512
@@ -117,6 +117,7 @@ frame_size = int(25 * sample_rate / 1000)
 shift_size = int(21 * sample_rate / 1000) 
 # Extract features
 features = []
+time_vectors = [] 
 for i in range(5):
     signals = read_vowels_file(training_path, vowels[i])
     features.append(calculate_each_vowel_feature(signals))
@@ -134,51 +135,51 @@ evaluate_testing_set(testing_path, features, target_labels)
 
 # Xuất 05 vector đặc trưng biểu diễn 05 nguyên âm trên cùng 01 đồ thị.
 # Plot features
-# frequencies = np.fft.fftfreq(N_FFT, 1/sample_rate)
+half_length = N_FFT // 2
+# Vẽ đồ thị cho nửa bên phải của 5 vector đặc trưng
+for i in range(5):
+    plt.plot(features[i][:half_length], label=vowels[i])
 
-# for i in range(5):
-#     plt.plot(frequencies, features[i], label=vowels[i])
-
-# plt.title('Vector dac trung cua 5 nguyen am')
-# plt.xlabel('Frequency (Hz)')
-# plt.ylabel('Amplitude')
-# plt.legend()
-# plt.show()
+plt.title('Vector đặc trưng của 5 nguyên âm')
+plt.xlabel('Sample')
+plt.ylabel('Amplitude')
+plt.legend()
+plt.show()
 
 
 
-# def create_confusion_matrix(testing_path, known_features, target_labels):
-#     true_labels = []
-#     predicted_labels = []
+def create_confusion_matrix(testing_path, known_features, target_labels):
+    true_labels = []
+    predicted_labels = []
 
-#     for dirs in sorted(os.listdir(testing_path)):
-#         sub_path = os.path.join(testing_path, dirs)
-#         for file_name in sorted(os.listdir(sub_path)):
-#             file_path = os.path.join(sub_path, file_name)
-#             true_label = file_name[0]
-#             signal, fs = lrs.load(file_path)
+    for dirs in sorted(os.listdir(testing_path)):
+        sub_path = os.path.join(testing_path, dirs)
+        for file_name in sorted(os.listdir(sub_path)):
+            file_path = os.path.join(sub_path, file_name)
+            true_label = file_name[0]
+            signal, fs = lrs.load(file_path)
 
-#             predicted_label = predict_signal_label(signal, known_features, target_labels)
+            predicted_label = predict_signal_label(signal, known_features, target_labels)
 
-#             true_labels.append(true_label)
-#             predicted_labels.append(predicted_label)
+            true_labels.append(true_label)
+            predicted_labels.append(predicted_label)
 
-#     # Tạo confusion matrix
-#     cm = confusion_matrix(true_labels, predicted_labels, labels=target_labels)
+    # Tạo confusion matrix
+    cm = confusion_matrix(true_labels, predicted_labels, labels=target_labels)
 
-#     # Hiển thị confusion matrix bằng heatmap
-#     plt.figure(figsize=(8, 6))
-#     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=target_labels, yticklabels=target_labels)
-#     plt.xlabel('Predicted Labels')
-#     plt.ylabel('True Labels')
-#     plt.title('Confusion Matrix')
-#     plt.show()
+    # Hiển thị confusion matrix bằng heatmap
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=target_labels, yticklabels=target_labels)
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('True Labels')
+    plt.title('Confusion Matrix')
+    plt.show()
 
-# # Đường dẫn của thư mục chứa 21 tập folder
-# testing_path = "D:/ex2/trimmed-NguyenAmKiemThu-16k"
+# Đường dẫn của thư mục chứa 21 tập folder
+testing_path = "D:\\BTNhom_XLTHS\\ex2\\trimmed-NguyenAmKiemThu-16k"
 
-# # Tạo confusion matrix
-# create_confusion_matrix(testing_path, features, vowels)
+# Tạo confusion matrix
+create_confusion_matrix(testing_path, features, vowels)
 
 
 

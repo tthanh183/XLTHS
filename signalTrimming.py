@@ -60,16 +60,16 @@ def browse_files(signal_path, output_path):
             print(exact_output_path)
 
 # Đường dẫn của thư mục chứa 21 tập folder
-main_path1 = "D:/ex2/NguyenAmKiemThu-16k"
+main_path1 = "D:\\BTNhom_XLTHS\\ex2\\NguyenAmHuanLuyen-16k"
 
 # Đường dẫn thư mục đầu ra
-output_path1 = "D:/ex2/trimmed-NguyenAmKiemThu-16k"
+output_path1 = "D:\\BTNhom_XLTHS\\ex2\\trimmed-NguyenAmHuanLuyen-16k"
 browse_files(main_path1, output_path1)
 
 # Đường dẫn của thư mục chứa 21 tập folder
-main_path = "D:/ex2/NguyenAmHuanLuyen-16k"
+main_path = "D:\\BTNhom_XLTHS\\ex2\\NguyenAmKiemThu-16k"
 
 # Đường dẫn thư mục đầu ra
-output_path = "D:/ex2/trimmed-NguyenAmHuanLuyen-16k"
+output_path = "D:\\BTNhom_XLTHS\\ex2\\trimmed-NguyenAmKiemThu-16k"
 # Xử lý trên toàn bộ cây thư mục
 browse_files(main_path, output_path)

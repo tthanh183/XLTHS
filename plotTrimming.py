@@ -70,13 +70,13 @@ def trim_audio(file_path, frame_length=0.025):
     return trimmed_audio, sample_rate
 
 # Đường dẫn của thư mục chứa 21 tập folder
-main_path = "D:/ex2/NguyenAmHuanLuyen-16k"
+main_path = "D:\\BTNhom_XLTHS\\ex2\\NguyenAmHuanLuyen-16k"
 
 # Lấy mẫu một file để minh họa
 sample_file_path = os.path.join(main_path, '23MTL', 'a.wav')
 
 # Đường dẫn thư mục đầu ra
-output_path = "D:/ex2/trimmed-NguyenAmHuanLuyen-16k"
+output_path = "D:\\BTNhom_XLTHS\\ex2\\trimmed-NguyenAmHuanLuyen-16k"
 
 # Trim âm thanh và vẽ đồ thị
 trim_audio(sample_file_path)
